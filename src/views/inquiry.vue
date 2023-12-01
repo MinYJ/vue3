@@ -1,9 +1,10 @@
 <template>
   <div>조회테이블 </div>
   <button @click="receive()">환율조회</button>
-  <div v-if="base.isInquiry.value">
-    <gridTable ref="coForwardGridTableRef" v-bind:grid-data="base.gridData.value" v-bind:tableId="'inquiry'" />
-  </div>
+  <button @click="reset()">리셋</button>
+  <div v-if="base.isInquiry.value">  </div>
+  <gridTable ref="coForwardGridTableRef" v-bind:grid-data="base.gridData.value"/>
+
 </template>
 
 <script setup>
@@ -44,9 +45,17 @@ const receive = () => {
 
   base.changeComponent('inquiry');
   base.getTableData(array_value);
+
+  /**
+   ** 방법1 v-bind:grid-data="base.gridData.value" v-bind:tableId="'inquiry'"
+  */
+
+  coForwardGridTableRef.value.setData(base.gridData.value);
 }
 
-
+const reset = () =>{
+  base.gridData.value.length = 0;
+}
 </script>
 
 <style lang="scss" scoped>

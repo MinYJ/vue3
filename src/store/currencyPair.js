@@ -25,6 +25,8 @@ export const useCurrencyPairStore = defineStore('CurrencyPair', ()=>{
       newIdNumber=lastIdNumber+1;
       linker.value.data[`link${newIdNumber}`]=`연결대기(${newIdNumber})`;
     }
+    console.log(`newIdNumber`);
+    console.log(newIdNumber);
     linker.value.idNumber=newIdNumber;
   }
 

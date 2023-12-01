@@ -4,19 +4,29 @@
     <input type="text"
       :value="inputValue"
       @input="inputValue = $event.target.value"
+
       placeholder="수량을 입력하세요"
       @keyup="keyup($event)"
-      @focus=onFocus($event);
+      @focus="onFocus($event)"
+      @change="fireEmit(`change`)"
     />
   </div>
 </template>
 
 <script setup>
+/*
+      :value="inputValue"
+      @input="inputValue = $event.target.value"
+*/
 import {ref} from 'vue';
 import currencyFormat from '@/js/currencyFormat.js';
 
 let inputValue = ref();
 let decimalPlaces = ref(2);
+let tranjactionCurrency=ref('KRW');
+
+let min=false;
+let max=false;
 
 const keyup = (event)=>{
   //입력값을 숫자형으로 변환
@@ -24,46 +34,31 @@ const keyup = (event)=>{
   let numberArray=[];
   let isDecimal=false;
   let decimalCnt=0;
-  let tranjactionCurrency=ref('KRW');
   const allowKey=['0','1','2','3','4','5','6','7','8','9'];
   const allowNumber=['0','1','2','3','4','5','6','7','8','9','.'];
   let tempArray=valueTemp.split('');
-  tempArray.forEach(num => {
-    if(allowNumber.includes(num)){
-      if(num=='.'){
-        if(decimalPlaces.value > 0) {
-          if(!isDecimal){
-            numberArray.push(num);
-            isDecimal=true;
-          }
-        }
-      } else{
-        if(isDecimal){
-          if(decimalPlaces.value>0){
-            decimalCnt=decimalCnt+1;
-            numberArray.push(num);
-          }
-        } else{
-          numberArray.push(num);
-        }
+
+
+  for(const num of tempArray){
+    if(!validation.isAllowNumber(allowNumber, num)) continue;
+    
+    
+    if(validation.isDot(num)) {
+      if(validation.checkDotCondition(decimalPlaces, isDecimal)){
+        numberArray.push(num);
+        isDecimal = true;
       }
-    };
-  });
+    } else {
+      if(validation.checkCondition(decimalPlaces, isDecimal)) decimalCnt=decimalCnt+1;
+      numberArray.push(num);
+    }
+  }
 
   let numberValue=numberArray.join('');
   console.log('numberValue: ', numberValue);
 
   if(event.key=='.'){
-    inputValue.value = numberValue;
-    return false;
-    // if(decimalPlaces.value>0){return false;}
-  }
-
-  //한글입력방지
-  const alphabet = /[ㄱ-ㅎ]/g;
-  if(alphabet.test(inputValue.value)){
-    inputValue.value=numberValue;
-    return false;
+    if(decimalPlaces.value>0) return false;
   }
 
   if(event.key=='k' || event.key=='K'){
@@ -74,14 +69,17 @@ const keyup = (event)=>{
     }
   }
 
-  inputValue.value = numberValue;
-
   let fractionDigitsValue = 0;
+
+  console.log(`decimalPlaces.value: `, decimalPlaces.value);
+  console.log(`decimalCnt: `, decimalCnt);
   if(isDecimal){
     if(decimalCnt<=decimalPlaces.value){
       fractionDigitsValue=decimalCnt;
     }else{
+      console.log(`decimalCnt2222222222: `, decimalCnt);
       fractionDigitsValue=decimalPlaces.value;
+      console.log(`fractionDigitsValue: `, fractionDigitsValue);
     }
   }
   let formatOption={
@@ -97,8 +95,62 @@ const keyup = (event)=>{
   }
 }
 
+const validation = {
+  isAllowNumber(allowNumber, num){
+    return allowNumber.includes(num);
+  },
+  isDot(num) {
+    return num.includes('.');
+  },
+  checkDotCondition(decimalPlaces, isDeciaml){
+    if(decimalPlaces.value > 0) {
+      if(!isDeciaml){
+        return true;
+      }
+    }
+  },
+  checkCondition(decimalPlaces, isDeciaml){
+    if(isDeciaml) {
+      if(decimalPlaces.value>0) {
+        return true;
+      }
+    }
+  }
+}
 const onFocus = (event)=>{
   event.target.select();
+}
+
+const fireEmit = (type)=>{
+  let valueTemp = inputValue.value;
+  let tempArray = valueTemp.split('');
+  const allowNumber = ['0','1','2','3','4','5','6','7','8','9','.'];
+  let numberArray = [];
+  tempArray.forEach(num =>{
+    if(allowNumber.includes(num)){
+      numberArray.push(num);
+    }
+  })
+  let numberValue = numberArray.join('');
+  let valueState = 'adhere';
+  if(type == 'change') {
+    if(min!==false&&numberValue<min){
+      numberValue=min;
+      valueState='minValue';
+    }
+    if(max!==false&&numberValue>max){
+      numberValue=max;
+      valueState='maxValue';
+    }
+
+    let formatOption={
+      style:'decimal',
+      minimumFractionDigits:decimalPlaces.value,
+      maximumFractionDigits:decimalPlaces.value,
+      lang:`ko-KR`
+    }
+    inputValue.value = currencyFormat[tranjactionCurrency.value](numberValue,formatOption);
+  }
 }
 </script>
 

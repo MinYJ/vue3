@@ -13,6 +13,7 @@ const currencyFormat={
       thisOption.style=(Object.keys(setOption).includes('style'))?setOption.style:this.option.style;
       thisOption.currencyDisplay=(Object.keys(setOption).includes('currencyDisplay'))?setOption.currencyDisplay:this.option.currencyDisplay;
       thisOption.minimumFractionDigits=(Object.keys(setOption).includes('minimumFractionDigits'))?setOption.maximumFractionDigits:this.option.maximumFractionDigits;
+      thisOption.maximumFractionDigits=(Object.keys(setOption).includes('maximumFractionDigits'))?setOption.maximumFractionDigits:this.option.maximumFractionDigits;
       thisOption.lang=(Object.keys(setOption).includes('lang'))?setOption.lang:this.option.lang;
     } else {
       thisOption=this.option;
@@ -23,7 +24,7 @@ const currencyFormat={
       currency: thisOption.currency,
       currencyDisplay:thisOption.currencyDisplay,
       minimumFractionDigits:thisOption.minimumFractionDigits,
-      maximumFractionDigits:thisOption.maximumFracctionDigits
+      maximumFractionDigits:thisOption.maximumFractionDigits
     }
     return new Intl.NumberFormat(thisOption.lang, formatOption).format(number);
   },

@@ -58,13 +58,21 @@ let gridData=ref(data.gridData);
 let tableId=data.tableId;
 let onSetting = ref(false);
 
+
 /*
 ** 테이블 구성 데이터를 변경함(외부에서 사용가능)
 */
 const setData=data=>{
+  console.log('data');
+  console.log(data);
   gridData.value = data;
 }
 
+//외부에서 사용 할 수 있는 함수를지정
+defineExpose({setData});
+
+// defineProps
+// defineEmits
 /*
 ** 특정 테이블 컬럼으로 정렬함(내부용)
 */
@@ -138,7 +146,6 @@ const onDrop = event =>{
   const dragId = event.dataTransfer.getData('text/plain');
   $(`.coforwardGridTableSetting li[data-id="${dragId}"]`).insertBefore(`.coforwardGridTableSetting li.dropPlaceholder`);
 }
-
 
 </script>
 
